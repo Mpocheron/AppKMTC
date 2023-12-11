@@ -23,6 +23,9 @@ class Connexion
     #[ORM\Column(length: 36)]
     private ?string $token = null;
 
+    #[ORM\ManyToOne(inversedBy: 'connexion')]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +63,18 @@ class Connexion
     public function setToken(string $token): static
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
