@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ModeleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ModeleRepository::class)]
@@ -13,7 +15,7 @@ class Modele
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 45)]
     private ?string $nom = null;
 
     #[ORM\Column]
@@ -26,7 +28,15 @@ class Modele
     private ?int $longueur = null;
 
     #[ORM\Column]
-    private ?int $poids = null;
+    private ?int $poidsMax = null;
+
+    #[ORM\OneToMany(mappedBy: 'leModel', targetEntity: Casier::class)]
+    private Collection $lesCasiers;
+
+    public function __construct()
+    {
+        $this->lesCasiers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -81,14 +91,44 @@ class Modele
         return $this;
     }
 
-    public function getPoids(): ?int
+    public function getPoidsMax(): ?int
     {
-        return $this->poids;
+        return $this->poidsMax;
     }
 
-    public function setPoids(int $poids): static
+    public function setPoidsMax(int $poidsMax): static
     {
-        $this->poids = $poids;
+        $this->poidsMax = $poidsMax;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Casier>
+     */
+    public function getLesCasiers(): Collection
+    {
+        return $this->lesCasiers;
+    }
+
+    public function addLesCasier(Casier $lesCasier): static
+    {
+        if (!$this->lesCasiers->contains($lesCasier)) {
+            $this->lesCasiers->add($lesCasier);
+            $lesCasier->setLeModel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLesCasier(Casier $lesCasier): static
+    {
+        if ($this->lesCasiers->removeElement($lesCasier)) {
+            // set the owning side to null (unless already changed)
+            if ($lesCasier->getLeModel() === $this) {
+                $lesCasier->setLeModel(null);
+            }
+        }
 
         return $this;
     }

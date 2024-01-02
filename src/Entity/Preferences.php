@@ -13,28 +13,34 @@ class Preferences
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $telephone = null;
+    #[ORM\Column]
+    private ?bool $sms = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?bool $mail = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?bool $push = null;
+
+    #[ORM\OneToOne(inversedBy: 'lePreferences', cascade: ['persist', 'remove'])]
+    private ?User $leUser = null;
+
+    #[ORM\ManyToOne]
+    private ?Relais $leRelais = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function isTelephone(): ?bool
+    public function isSms(): ?bool
     {
-        return $this->telephone;
+        return $this->sms;
     }
 
-    public function setTelephone(?bool $telephone): static
+    public function setSms(bool $sms): static
     {
-        $this->telephone = $telephone;
+        $this->sms = $sms;
 
         return $this;
     }
@@ -44,7 +50,7 @@ class Preferences
         return $this->mail;
     }
 
-    public function setMail(?bool $mail): static
+    public function setMail(bool $mail): static
     {
         $this->mail = $mail;
 
@@ -56,9 +62,33 @@ class Preferences
         return $this->push;
     }
 
-    public function setPush(?bool $push): static
+    public function setPush(bool $push): static
     {
         $this->push = $push;
+
+        return $this;
+    }
+
+    public function getLeUser(): ?User
+    {
+        return $this->leUser;
+    }
+
+    public function setLeUser(?User $leUser): static
+    {
+        $this->leUser = $leUser;
+
+        return $this;
+    }
+
+    public function getLeRelais(): ?Relais
+    {
+        return $this->leRelais;
+    }
+
+    public function setLeRelais(?Relais $leRelais): static
+    {
+        $this->leRelais = $leRelais;
 
         return $this;
     }

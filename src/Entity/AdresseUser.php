@@ -13,22 +13,39 @@ class AdresseUser
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'adresseUser')]
-    private ?User $user = null;
+    #[ORM\ManyToOne(inversedBy: 'lesAdresseUsers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $leuser = null;
+
+    #[ORM\ManyToOne(inversedBy: 'lesAdresseUsers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Adresse $leAdresse = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getLeuser(): ?User
     {
-        return $this->user;
+        return $this->leuser;
     }
 
-    public function setUser(?User $user): static
+    public function setLeuser(?User $leuser): static
     {
-        $this->user = $user;
+        $this->leuser = $leuser;
+
+        return $this;
+    }
+
+    public function getLeAdresse(): ?Adresse
+    {
+        return $this->leAdresse;
+    }
+
+    public function setLeAdresse(?Adresse $leAdresse): static
+    {
+        $this->leAdresse = $leAdresse;
 
         return $this;
     }

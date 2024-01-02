@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CommandeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
@@ -14,26 +16,39 @@ class Commande
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $Hauteur = null;
+    private ?int $hauteur = null;
 
     #[ORM\Column]
-    private ?int $Largeur = null;
+    private ?int $largeur = null;
 
     #[ORM\Column]
-    private ?int $Longueur = null;
+    private ?int $longueur = null;
 
     #[ORM\Column]
-    private ?int $Poids = null;
+    private ?int $poids = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commande')]
-    private ?User $user = null;
+    #[ORM\OneToMany(mappedBy: 'laCommande', targetEntity: Status::class)]
+    private Collection $lesStatus;
 
-    #[ORM\ManyToOne(inversedBy: 'commandes')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Etat $etat = null;
+    #[ORM\ManyToOne(inversedBy: 'lesCommandes')]
+    private ?User $leUser = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commandes')]
-    private ?Casier $casier = null;
+    #[ORM\ManyToOne(inversedBy: 'lesExpeditionsCommandes')]
+    private ?Adresse $adresseExpedition = null;
+
+    #[ORM\ManyToOne(inversedBy: 'lesDestinationsCommandes')]
+    private ?adresse $adresseDestination = null;
+
+    #[ORM\ManyToOne(inversedBy: 'lesFacturationsCommandes')]
+    private ?Adresse $adresseFacturation = null;
+
+    #[ORM\OneToOne(inversedBy: 'laCommande', cascade: ['persist', 'remove'])]
+    private ?Casier $leCasier = null;
+
+    public function __construct()
+    {
+        $this->lesStatus = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -42,84 +57,138 @@ class Commande
 
     public function getHauteur(): ?int
     {
-        return $this->Hauteur;
+        return $this->hauteur;
     }
 
-    public function setHauteur(int $Hauteur): static
+    public function setHauteur(int $hauteur): static
     {
-        $this->Hauteur = $Hauteur;
+        $this->hauteur = $hauteur;
 
         return $this;
     }
 
     public function getLargeur(): ?int
     {
-        return $this->Largeur;
+        return $this->largeur;
     }
 
-    public function setLargeur(int $Largeur): static
+    public function setLargeur(int $largeur): static
     {
-        $this->Largeur = $Largeur;
+        $this->largeur = $largeur;
 
         return $this;
     }
 
     public function getLongueur(): ?int
     {
-        return $this->Longueur;
+        return $this->longueur;
     }
 
-    public function setLongueur(int $Longueur): static
+    public function setLongueur(int $longueur): static
     {
-        $this->Longueur = $Longueur;
+        $this->longueur = $longueur;
 
         return $this;
     }
 
     public function getPoids(): ?int
     {
-        return $this->Poids;
+        return $this->poids;
     }
 
-    public function setPoids(int $Poids): static
+    public function setPoids(int $poids): static
     {
-        $this->Poids = $Poids;
+        $this->poids = $poids;
 
         return $this;
     }
 
-    public function getUser(): ?User
+    /**
+     * @return Collection<int, Status>
+     */
+    public function getLesStatus(): Collection
     {
-        return $this->user;
+        return $this->lesStatus;
     }
 
-    public function setUser(?User $user): static
+    public function addLesStatus(Status $lesStatus): static
     {
-        $this->user = $user;
+        if (!$this->lesStatus->contains($lesStatus)) {
+            $this->lesStatus->add($lesStatus);
+            $lesStatus->setLaCommande($this);
+        }
 
         return $this;
     }
 
-    public function getEtat(): ?Etat
+    public function removeLesStatus(Status $lesStatus): static
     {
-        return $this->etat;
-    }
-
-    public function setEtat(?Etat $etat): static
-    {
-        $this->etat = $etat;
+        if ($this->lesStatus->removeElement($lesStatus)) {
+            // set the owning side to null (unless already changed)
+            if ($lesStatus->getLaCommande() === $this) {
+                $lesStatus->setLaCommande(null);
+            }
+        }
 
         return $this;
     }
 
-    public function getCasier(): ?Casier
+    public function getLeUser(): ?User
     {
-        return $this->casier;
+        return $this->leUser;
     }
 
-    public function setCasier(?Casier $casier): static
+    public function setLeUser(?User $leUser): static
     {
-        $this->casier = $casier;
+        $this->leUser = $leUser;
+
+        return $this;
+    }
+
+    public function getAdresseExpedition(): ?Adresse
+    {
+        return $this->adresseExpedition;
+    }
+
+    public function setAdresseExpedition(?Adresse $adresseExpedition): static
+    {
+        $this->adresseExpedition = $adresseExpedition;
+
+        return $this;
+    }
+
+    public function getAdresseDestination(): ?adresse
+    {
+        return $this->adresseDestination;
+    }
+
+    public function setAdresseDestination(?adresse $adresseDestination): static
+    {
+        $this->adresseDestination = $adresseDestination;
+
+        return $this;
+    }
+
+    public function getAdresseFacturation(): ?Adresse
+    {
+        return $this->adresseFacturation;
+    }
+
+    public function setAdresseFacturation(?Adresse $adresseFacturation): static
+    {
+        $this->adresseFacturation = $adresseFacturation;
+
+        return $this;
+    }
+
+    public function getLeCasier(): ?Casier
+    {
+        return $this->leCasier;
+    }
+
+    public function setLeCasier(?Casier $leCasier): static
+    {
+        $this->leCasier = $leCasier;
 
         return $this;
     }

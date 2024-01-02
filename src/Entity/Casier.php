@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\CasierRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CasierRepository::class)]
@@ -15,45 +13,63 @@ class Casier
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToMany(mappedBy: 'casier', targetEntity: Commande::class)]
-    private Collection $commandes;
+    #[ORM\ManyToOne(inversedBy: 'lesCasiers')]
+    private ?modele $leModel = null;
 
-    public function __construct()
-    {
-        $this->commandes = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(inversedBy: 'lesCasiers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Relais $leRelais = null;
+
+    #[ORM\OneToOne(mappedBy: 'leCasier', cascade: ['persist', 'remove'])]
+    private ?Commande $laCommande = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Commande>
-     */
-    public function getCommandes(): Collection
+    public function getLeModel(): ?modele
     {
-        return $this->commandes;
+        return $this->leModel;
     }
 
-    public function addCommande(Commande $commande): static
+    public function setLeModel(?modele $leModel): static
     {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes->add($commande);
-            $commande->setCasier($this);
-        }
+        $this->leModel = $leModel;
 
         return $this;
     }
 
-    public function removeCommande(Commande $commande): static
+    public function getLeRelais(): ?Relais
     {
-        if ($this->commandes->removeElement($commande)) {
-            // set the owning side to null (unless already changed)
-            if ($commande->getCasier() === $this) {
-                $commande->setCasier(null);
-            }
+        return $this->leRelais;
+    }
+
+    public function setLeRelais(?Relais $leRelais): static
+    {
+        $this->leRelais = $leRelais;
+
+        return $this;
+    }
+
+    public function getLaCommande(): ?Commande
+    {
+        return $this->laCommande;
+    }
+
+    public function setLaCommande(?Commande $laCommande): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($laCommande === null && $this->laCommande !== null) {
+            $this->laCommande->setLeCasier(null);
         }
+
+        // set the owning side of the relation if necessary
+        if ($laCommande !== null && $laCommande->getLeCasier() !== $this) {
+            $laCommande->setLeCasier($this);
+        }
+
+        $this->laCommande = $laCommande;
 
         return $this;
     }

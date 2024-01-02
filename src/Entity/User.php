@@ -6,51 +6,42 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 30)]
-    private ?string $Nom = null;
+    #[ORM\Column(length: 180, unique: true)]
+    private ?string $email = null;
 
-    #[ORM\Column(length: 30)]
-    private ?string $Prenom = null;
+    #[ORM\Column]
+    private array $roles = [];
 
-    #[ORM\Column(length: 30)]
-    private ?string $Mail = null;
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $Role = null;
+    #[ORM\OneToMany(mappedBy: 'leuser', targetEntity: AdresseUser::class, orphanRemoval: true)]
+    private Collection $lesAdresseUsers;
 
-    #[ORM\Column(length: 10)]
-    private ?string $Telephone = null;
+    #[ORM\OneToOne(mappedBy: 'leUser', cascade: ['persist', 'remove'])]
+    private ?Preferences $lePreferences = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commande::class)]
-    private Collection $commande;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: AdresseUser::class)]
-    private Collection $adresseUser;
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Preferences $preferences = null;
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Login $login = null;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Connexion::class)]
-    private Collection $connexion;
+    #[ORM\OneToMany(mappedBy: 'leUser', targetEntity: Commande::class)]
+    private Collection $lesCommandes;
 
     public function __construct()
     {
-        $this->commande = new ArrayCollection();
-        $this->adresseUser = new ArrayCollection();
-        $this->connexion = new ArrayCollection();
+        $this->lesAdresseUsers = new ArrayCollection();
+        $this->lesCommandes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -58,62 +49,119 @@ class User
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getEmail(): ?string
     {
-        return $this->Nom;
+        return $this->email;
     }
 
-    public function setNom(string $Nom): static
+    public function setEmail(string $email): static
     {
-        $this->Nom = $Nom;
+        $this->email = $email;
 
         return $this;
     }
 
-    public function getPrenom(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
     {
-        return $this->Prenom;
+        return (string) $this->email;
     }
 
-    public function setPrenom(string $Prenom): static
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        $this->Prenom = $Prenom;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
 
         return $this;
     }
 
-    public function getMail(): ?string
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
-        return $this->Mail;
+        return $this->password;
     }
 
-    public function setMail(string $Mail): static
+    public function setPassword(string $password): static
     {
-        $this->Mail = $Mail;
+        $this->password = $password;
 
         return $this;
     }
 
-    public function getRole(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
     {
-        return $this->Role;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
-    public function setRole(string $Role): static
+    /**
+     * @return Collection<int, AdresseUser>
+     */
+    public function getLesAdresseUsers(): Collection
     {
-        $this->Role = $Role;
+        return $this->lesAdresseUsers;
+    }
+
+    public function addLesAdresseUser(AdresseUser $lesAdresseUser): static
+    {
+        if (!$this->lesAdresseUsers->contains($lesAdresseUser)) {
+            $this->lesAdresseUsers->add($lesAdresseUser);
+            $lesAdresseUser->setLeuser($this);
+        }
 
         return $this;
     }
 
-    public function getTelephone(): ?string
+    public function removeLesAdresseUser(AdresseUser $lesAdresseUser): static
     {
-        return $this->Telephone;
+        if ($this->lesAdresseUsers->removeElement($lesAdresseUser)) {
+            // set the owning side to null (unless already changed)
+            if ($lesAdresseUser->getLeuser() === $this) {
+                $lesAdresseUser->setLeuser(null);
+            }
+        }
+
+        return $this;
     }
 
-    public function setTelephone(string $Telephone): static
+    public function getLePreferences(): ?Preferences
     {
-        $this->Telephone = $Telephone;
+        return $this->lePreferences;
+    }
+
+    public function setLePreferences(?Preferences $lePreferences): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($lePreferences === null && $this->lePreferences !== null) {
+            $this->lePreferences->setLeUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($lePreferences !== null && $lePreferences->getLeUser() !== $this) {
+            $lePreferences->setLeUser($this);
+        }
+
+        $this->lePreferences = $lePreferences;
 
         return $this;
     }
@@ -121,111 +169,27 @@ class User
     /**
      * @return Collection<int, Commande>
      */
-    public function getCommande(): Collection
+    public function getLesCommandes(): Collection
     {
-        return $this->commande;
+        return $this->lesCommandes;
     }
 
-    public function addCommande(Commande $commande): static
+    public function addLesCommande(Commande $lesCommande): static
     {
-        if (!$this->commande->contains($commande)) {
-            $this->commande->add($commande);
-            $commande->setUser($this);
+        if (!$this->lesCommandes->contains($lesCommande)) {
+            $this->lesCommandes->add($lesCommande);
+            $lesCommande->setLeUser($this);
         }
 
         return $this;
     }
 
-    public function removeCommande(Commande $commande): static
+    public function removeLesCommande(Commande $lesCommande): static
     {
-        if ($this->commande->removeElement($commande)) {
+        if ($this->lesCommandes->removeElement($lesCommande)) {
             // set the owning side to null (unless already changed)
-            if ($commande->getUser() === $this) {
-                $commande->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, AdresseUser>
-     */
-    public function getAdresseUser(): Collection
-    {
-        return $this->adresseUser;
-    }
-
-    public function addAdresseUser(AdresseUser $adresseUser): static
-    {
-        if (!$this->adresseUser->contains($adresseUser)) {
-            $this->adresseUser->add($adresseUser);
-            $adresseUser->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAdresseUser(AdresseUser $adresseUser): static
-    {
-        if ($this->adresseUser->removeElement($adresseUser)) {
-            // set the owning side to null (unless already changed)
-            if ($adresseUser->getUser() === $this) {
-                $adresseUser->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getPreferences(): ?Preferences
-    {
-        return $this->preferences;
-    }
-
-    public function setPreferences(?Preferences $preferences): static
-    {
-        $this->preferences = $preferences;
-
-        return $this;
-    }
-
-    public function getLogin(): ?Login
-    {
-        return $this->login;
-    }
-
-    public function setLogin(Login $login): static
-    {
-        $this->login = $login;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Connexion>
-     */
-    public function getConnexion(): Collection
-    {
-        return $this->connexion;
-    }
-
-    public function addConnexion(Connexion $connexion): static
-    {
-        if (!$this->connexion->contains($connexion)) {
-            $this->connexion->add($connexion);
-            $connexion->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeConnexion(Connexion $connexion): static
-    {
-        if ($this->connexion->removeElement($connexion)) {
-            // set the owning side to null (unless already changed)
-            if ($connexion->getUser() === $this) {
-                $connexion->setUser(null);
+            if ($lesCommande->getLeUser() === $this) {
+                $lesCommande->setLeUser(null);
             }
         }
 
