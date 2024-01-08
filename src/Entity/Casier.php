@@ -23,6 +23,9 @@ class Casier
     #[ORM\OneToOne(mappedBy: 'leCasier', cascade: ['persist', 'remove'])]
     private ?Commande $laCommande = null;
 
+    #[ORM\Column]
+    private ?bool $utilise = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -70,6 +73,18 @@ class Casier
         }
 
         $this->laCommande = $laCommande;
+
+        return $this;
+    }
+
+    public function isUtilise(): ?bool
+    {
+        return $this->utilise;
+    }
+
+    public function setUtilise(bool $utilise): static
+    {
+        $this->utilise = $utilise;
 
         return $this;
     }
