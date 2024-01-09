@@ -14,7 +14,7 @@ class Casier
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'lesCasiers')]
-    private ?modele $leModel = null;
+    private ?Modele $leModel = null;
 
     #[ORM\ManyToOne(inversedBy: 'lesCasiers')]
     #[ORM\JoinColumn(nullable: false)]
@@ -31,12 +31,12 @@ class Casier
         return $this->id;
     }
 
-    public function getLeModel(): ?modele
+    public function getLeModel(): ?Modele
     {
         return $this->leModel;
     }
 
-    public function setLeModel(?modele $leModel): static
+    public function setLeModel(?Modele $leModel): static
     {
         $this->leModel = $leModel;
 
