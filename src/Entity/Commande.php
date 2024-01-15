@@ -37,7 +37,7 @@ class Commande
     private ?Adresse $adresseExpedition = null;
 
     #[ORM\ManyToOne(inversedBy: 'lesDestinationsCommandes')]
-    private ?adresse $adresseDestination = null;
+    private ?Adresse $adresseDestination = null;
 
     #[ORM\ManyToOne(inversedBy: 'lesFacturationsCommandes')]
     private ?Adresse $adresseFacturation = null;
@@ -157,12 +157,12 @@ class Commande
         return $this;
     }
 
-    public function getAdresseDestination(): ?adresse
+    public function getAdresseDestination(): ?Adresse
     {
         return $this->adresseDestination;
     }
 
-    public function setAdresseDestination(?adresse $adresseDestination): static
+    public function setAdresseDestination(?Adresse $adresseDestination): static
     {
         $this->adresseDestination = $adresseDestination;
 
