@@ -1,25 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% form_theme editForm 'bootstrap_4_layout.html.twig' %}
+{% block content %}
 
-{{ form_start(editForm) }}
+	{% form_theme editForm 'bootstrap_4_layout.html.twig' %}
 
-{{ form_row(editForm.email) }}
+	{{ form_start(editForm, {'attr': {'class': 'form-horizontal'}}) }}
 
-{{ form_row(editForm.firstname) }}
+	{{ form_row(editForm.email) }}
 
-{{ form_row(editForm.lastname) }}
+	{{ form_row(editForm.firstname) }}
 
-{{ form_row(editForm.address) }}
+	{{ form_row(editForm.lastname) }}
 
-{{ form_row(editForm.zipcode) }}
+	{{ form_row(editForm.address) }}
 
-{{ form_row(editForm.city) }}
+	{{ form_row(editForm.zipcode) }}
 
-{{ form_row(editForm.country) }}
+	{{ form_row(editForm.city) }}
 
-{{ form_row(editForm.phone) }}
+	{{ form_row(editForm.country) }}
 
-<button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+	{{ form_row(editForm.phone) }}
 
-{{ form_end(editForm) }}
+	<button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+
+	{{ form_end(editForm) }}
+
+
+{% endblock %}
