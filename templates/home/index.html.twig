@@ -2,9 +2,7 @@
 
 {% block title %}Hello HomeController!{% endblock %}
 {% block stylesheets %}
-    <link rel="stylesheet" href="/assets/styles/globals.css" />
-    <link rel="stylesheet" href="/assets/styles/style.css" />
-    <link rel="stylesheet" href="/assets/styles/styleguide.css" />
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 {% block body %}
 
