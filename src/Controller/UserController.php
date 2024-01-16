@@ -14,11 +14,18 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
 {
+    /**
+     * Ce controller nous permet d'éditer le profil de l'utilisateur connecté
+     * 
+     * @param User $user
+     * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $userPasswordHasher
+     * @param Request $request
+     * @return Response
+     */
 
     #[Route('/user/edit/{id}', name: 'app_user')] 
-    /**
-     * @Route("/user/edit", name="user_edit")
-     */
+    
     public function editUser(Request $request, User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         //Si l'utilisateur n'est pas connecté, il est redirigé vers la page de connexion
@@ -38,6 +45,7 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             
+            $user = $form->getData();
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
@@ -46,6 +54,9 @@ class UserController extends AbstractController
                 );
             $entityManager->persist($user);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Votre profil a bien été modifié');
+
             return $this->redirectToRoute('app_user');
         }
 
