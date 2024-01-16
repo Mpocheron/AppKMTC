@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;  
 use App\Form\EditUserType;
 use App\Form\UserType;  
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ class UserController extends AbstractController
     /**
      * @Route("/user/edit", name="user_edit")
      */
-    public function editUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    public function editUser(Request $request, User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         
         $form = $this->createForm(EditUserType::class, $user);
@@ -26,6 +27,12 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             
+            $user->setPassword(
+                $userPasswordHasher->hashPassword(
+                    $user,
+                    $form->get('password')->getData()
+                )
+                );
             $entityManager->persist($user);
             $entityManager->flush();
             return $this->redirectToRoute('app_user');
