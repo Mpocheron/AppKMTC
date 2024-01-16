@@ -242,4 +242,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    //todo : test et doc
+    public function addRole(Array|string $newRoles): static
+    {
+        if(is_string($newRoles)) {
+            $this->roles[] = $newRoles;
+        }
+        else {
+            $this->roles = array_merge($this->roles, $newRoles);
+        }
+        return $this;
+    }
 }
