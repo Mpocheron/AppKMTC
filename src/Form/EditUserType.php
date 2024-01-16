@@ -16,7 +16,6 @@ class EditUserType extends AbstractType
             ->add('nom')
             ->add('prenom')
             ->add('telephone')
-            ->add('email')
             ->add('password')
         ;
     }
