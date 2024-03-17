@@ -40,7 +40,7 @@ class CacheClearCommand extends Command
     private CacheClearerInterface $cacheClearer;
     private Filesystem $filesystem;
 
-    public function __construct(CacheClearerInterface $cacheClearer, Filesystem $filesystem = null)
+    public function __construct(CacheClearerInterface $cacheClearer, ?Filesystem $filesystem = null)
     {
         parent::__construct();
 
@@ -200,7 +200,7 @@ EOF
 
         if (null === $mounts) {
             $mounts = [];
-            if ('/' === \DIRECTORY_SEPARATOR && $files = @file('/proc/mounts')) {
+            if ('/' === \DIRECTORY_SEPARATOR && is_readable('/proc/mounts') && $files = @file('/proc/mounts')) {
                 foreach ($files as $mount) {
                     $mount = \array_slice(explode(' ', $mount), 1, -3);
                     if (!\in_array(array_pop($mount), ['vboxsf', 'nfs'])) {

@@ -131,7 +131,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        $willBeAvailable = static function (string $package, string $class, string $parentPackage = null) {
+        $willBeAvailable = static function (string $package, string $class, ?string $parentPackage = null) {
             $parentPackages = (array) $parentPackage;
             $parentPackages[] = 'symfony/framework-bundle';
 
@@ -891,6 +891,10 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('importmap_polyfill')
                             ->info('The importmap name that will be used to load the polyfill. Set to false to disable.')
+                            ->validate()
+                                ->ifTrue()
+                                ->thenInvalid('Invalid "importmap_polyfill" value. Must be either an importmap name or false.')
+                            ->end()
                             ->defaultValue('es-module-shims')
                         ->end()
                         ->arrayNode('importmap_script_attributes')
