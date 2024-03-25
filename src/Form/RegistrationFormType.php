@@ -26,8 +26,14 @@ class RegistrationFormType extends AbstractType
                 'constraints' => [
                     new Regex([
                         'pattern' => '/[0-9]/',
-                        'message' => 'Veuillez rentrer un numero de téléphone valide'
-                    ])
+                        'message' => 'Veuillez entrer un numero de téléphone valide'
+                    ]),
+                    new Length([
+                        'min' => 10,
+                        'max' => 10,
+                        'minMessage' => 'Veuillez entrer un numero de téléphone valide',
+                        'maxMessage' => 'Veuillez entrer un numero de téléphone valide',
+                    ]),
                 ]
             ])
             ->add('agreeTerms', CheckboxType::class, [
@@ -53,7 +59,6 @@ class RegistrationFormType extends AbstractType
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
                     ]),
-                    new Regex([])
                 ],
             ])
         ;
