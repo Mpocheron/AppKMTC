@@ -15,15 +15,9 @@ class UserType extends AbstractType
     {
         $builder
             ->add('email') // Ajoute un champ email
-            ->add('roles') // Ajoute un champ roles
-            ->add('password') // Ajoute un champ password
             ->add('nom') // Ajoute un champ nom
             ->add('prenom') // Ajoute un champ prenom
             ->add('telephone') // Ajoute un champ telephone
-            ->add('lePreferences', EntityType::class, [ // Ajoute un champ lePreferences de type Entity
-                'class' => Preferences::class, // La classe liée est Preferences
-'choice_label' => 'id', // L'identifiant est utilisé comme label
-            ])
         ;
     }
 
