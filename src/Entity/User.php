@@ -243,7 +243,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    //todo : test et doc
+    /**
+     * Ajoute un rôle à un utilisateur
+     * 
+     * @param Array|String $newRoles Le ou les rôles à ajouter
+     */
     public function addRole(Array|string $newRoles): static
     {
         if(is_string($newRoles)) {
